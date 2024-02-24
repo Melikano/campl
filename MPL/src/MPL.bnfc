@@ -129,6 +129,8 @@ MPL_CONCURRENT_TYPE_DEFN . MplDefn ::= ConcurrentTypeDefn ;
 MPL_FUNCTION_DEFN        . MplDefn ::= FunctionDefn ;
 MPL_PROCESS_DEFN         . MplDefn ::= ProcessDefn ;
 MPL_IMPORT_DEFN          . MplDefn ::= ImportDefn ;
+MPL_TYPECLASS_DEFN       . MplDefn ::= TypeClassDefn;
+MPL_INSTANCE_DEFN        . MplDefn ::= TypeClassInstanceDefn;
 
 MPL_DEFNTEST . MplDefn ::= "potato" ;
 
@@ -540,3 +542,37 @@ IMPORT_SPEC_DEFN      . ImportDefn ::= "include"               UIdent LBracket [
 IMPORT_DEFN           . ImportDefn ::= "include"               UIdent                                         ;
 
 -- separator for list is ','
+
+-- ====================================================================
+--  MPL typeclass definition
+-- ====================================================================
+FUNCTION_SIGN . ClassPropSignature ::= "fun" PIdent "::" [MplType] "->" MplType ; 
+PROCESS_SIGN . ClassPropSignature ::= "proc" PIdent "::" [MplType]  "|" [MplType] "=>" [MplType] ;
+
+TYPE_CONSTRAINT . TypeConstraint ::= UIdent MplType ;
+TYPE_CONSTRAINT_HIGHER_ORDER . TypeConstraint ::= UIdent "\\" [UIdent] "->" MplType ;
+
+TYPECLASS_DEFN . TypeClassDefn ::= 
+    "class" TypeConstraint "where" "{" [ ClassPropSignature ]"}" ;
+
+TYPECLASS_SUPERCLASS_DEFN . TypeClassDefn ::= 
+    "class" [TypeConstraint] "=>" TypeConstraint "where" "{" [ ClassPropSignature ]"}";
+
+separator nonempty ClassPropSignature ";" ;
+separator nonempty UIdent ",";
+-- ====================================================================
+--  MPL typeclass instance definition
+-- ====================================================================
+
+FUNCTION_DEF . ClassPropDefn ::= FunctionDefn ;
+PROCESS_DEF . ClassPropDefn ::= ProcessDefn ;
+
+TYPECLASS_INSTANCE_DEFN . TypeClassInstanceDefn ::=
+    "instance" TypeConstraint "where" "{" [ ClassPropDefn ]"}";
+
+TYPECLASS_INSTANCE_DEPENDENCY_DEFN . TypeClassInstanceDefn ::=
+    "instance" [TypeConstraint] "=>" TypeConstraint "where" "{" [ ClassPropDefn ]"}";
+
+
+separator nonempty TypeConstraint "," ;
+separator nonempty ClassPropDefn ";" ;

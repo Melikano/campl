@@ -173,18 +173,19 @@ UPIdent literals are recognized by the regular expression
 The set of reserved words is the set of terminals appearing in the grammar. Those reserved words that consist of non-letter characters are called symbols, and they are treated in a different way from those that are similar to identifiers. The lexer follows rules familiar from languages like Haskell, C, and Java, including longest match and spacing conventions.
 
 The reserved words used in MPL are the following:
-  | ``and`` | ``as`` | ``codata`` | ``coprotocol``
-  | ``data`` | ``defn`` | ``do`` | ``else``
-  | ``fold`` | ``fun`` | ``if`` | ``in``
-  | ``include`` | ``into`` | ``let`` | ``neg``
-  | ``of`` | ``on`` | ``plug`` | ``potato``
-  | ``proc`` | ``protocol`` | ``race`` | ``switch``
-  | ``then`` | ``unfold`` | ``where`` | ``with``
+  | ``and`` | ``as`` | ``class`` | ``codata``
+  | ``coprotocol`` | ``data`` | ``defn`` | ``do``
+  | ``else`` | ``fold`` | ``fun`` | ``if``
+  | ``in`` | ``include`` | ``instance`` | ``into``
+  | ``let`` | ``neg`` | ``of`` | ``on``
+  | ``plug`` | ``potato`` | ``proc`` | ``protocol``
+  | ``race`` | ``switch`` | ``then`` | ``unfold``
+  | ``where`` | ``with`` |  |
 
 The symbols used in MPL are the following:
   | , | { | } | ;
   | | | -> | = | ::
-  | => | . | := |
+  | => | . | := | \
 
 ===Comments===
 Single-line comments begin with --.Multiple-line comments are  enclosed with {- and -}.
@@ -215,6 +216,8 @@ All other symbols are terminals.
   |  |  **|**  | //FunctionDefn//
   |  |  **|**  | //ProcessDefn//
   |  |  **|**  | //ImportDefn//
+  |  |  **|**  | //TypeClassDefn//
+  |  |  **|**  | //TypeClassInstanceDefn//
   |  |  **|**  | ``potato``
   | //MplType// | -> | //MplType0//
   | //MplType0// | -> | //MplType1// //Par// //MplType1//
@@ -443,6 +446,24 @@ All other symbols are terminals.
   |  |  **|**  | ``include`` //PString// //Colon// //UIdent//
   |  |  **|**  | ``include`` //UIdent// //LBracket// //[PIdent]// ``|`` //[PIdent]// //RBracket//
   |  |  **|**  | ``include`` //UIdent//
+  | //ClassPropSignature// | -> | ``fun`` //PIdent// ``::`` //[MplType]// ``->`` //MplType//
+  |  |  **|**  | ``proc`` //PIdent// ``::`` //[MplType]// ``|`` //[MplType]// ``=>`` //[MplType]//
+  | //TypeConstraint// | -> | //UIdent// //MplType//
+  |  |  **|**  | //UIdent// ``\`` //[UIdent]// ``->`` //MplType//
+  | //TypeClassDefn// | -> | ``class`` //TypeConstraint// ``where`` ``{`` //[ClassPropSignature]// ``}``
+  |  |  **|**  | ``class`` //[TypeConstraint]// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassPropSignature]// ``}``
+  | //[ClassPropSignature]// | -> | //ClassPropSignature//
+  |  |  **|**  | //ClassPropSignature// ``;`` //[ClassPropSignature]//
+  | //[UIdent]// | -> | //UIdent//
+  |  |  **|**  | //UIdent// ``,`` //[UIdent]//
+  | //ClassPropDefn// | -> | //FunctionDefn//
+  |  |  **|**  | //ProcessDefn//
+  | //TypeClassInstanceDefn// | -> | ``instance`` //TypeConstraint// ``where`` ``{`` //[ClassPropDefn]// ``}``
+  |  |  **|**  | ``instance`` //[TypeConstraint]// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassPropDefn]// ``}``
+  | //[TypeConstraint]// | -> | //TypeConstraint//
+  |  |  **|**  | //TypeConstraint// ``,`` //[TypeConstraint]//
+  | //[ClassPropDefn]// | -> | //ClassPropDefn//
+  |  |  **|**  | //ClassPropDefn// ``;`` //[ClassPropDefn]//
 
 
 

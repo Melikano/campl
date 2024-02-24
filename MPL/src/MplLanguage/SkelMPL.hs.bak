@@ -192,6 +192,8 @@ transMplDefn x = case x of
   MplLanguage.AbsMPL.MPL_FUNCTION_DEFN functiondefn -> failure x
   MplLanguage.AbsMPL.MPL_PROCESS_DEFN processdefn -> failure x
   MplLanguage.AbsMPL.MPL_IMPORT_DEFN importdefn -> failure x
+  MplLanguage.AbsMPL.MPL_TYPECLASS_DEFN typeclassdefn -> failure x
+  MplLanguage.AbsMPL.MPL_INSTANCE_DEFN typeclassinstancedefn -> failure x
   MplLanguage.AbsMPL.MPL_DEFNTEST -> failure x
 
 transMplType :: MplLanguage.AbsMPL.MplType -> Result
@@ -453,7 +455,26 @@ transProcessSwitchPhrase x = case x of
 
 transImportDefn :: MplLanguage.AbsMPL.ImportDefn -> Result
 transImportDefn x = case x of
-  MplLanguage.AbsMPL.IMPORT_DIR_SPEC_DEFN pstring uident lbracket pidents1 pidents2 rbracket -> failure x
-  MplLanguage.AbsMPL.IMPORT_DIR_DEFN pstring uident -> failure x
+  MplLanguage.AbsMPL.IMPORT_DIR_SPEC_DEFN pstring colon uident lbracket pidents1 pidents2 rbracket -> failure x
+  MplLanguage.AbsMPL.IMPORT_DIR_DEFN pstring colon uident -> failure x
   MplLanguage.AbsMPL.IMPORT_SPEC_DEFN uident lbracket pidents1 pidents2 rbracket -> failure x
   MplLanguage.AbsMPL.IMPORT_DEFN uident -> failure x
+
+transFunctionSignature :: MplLanguage.AbsMPL.FunctionSignature -> Result
+transFunctionSignature x = case x of
+  MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> failure x
+
+transTypeConstraint :: MplLanguage.AbsMPL.TypeConstraint -> Result
+transTypeConstraint x = case x of
+  MplLanguage.AbsMPL.TYPE_CONSTRAINT uident mpltype -> failure x
+  MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER uident uidents mpltype -> failure x
+
+transTypeClassDefn :: MplLanguage.AbsMPL.TypeClassDefn -> Result
+transTypeClassDefn x = case x of
+  MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint functionsignatures -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN typeconstraints typeconstraint functionsignatures -> failure x
+
+transTypeClassInstanceDefn :: MplLanguage.AbsMPL.TypeClassInstanceDefn -> Result
+transTypeClassInstanceDefn x = case x of
+  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN typeconstraint functiondefns -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN typeconstraints typeconstraint functiondefns -> failure x

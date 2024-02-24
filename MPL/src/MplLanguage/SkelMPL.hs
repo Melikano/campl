@@ -192,6 +192,8 @@ transMplDefn x = case x of
   MplLanguage.AbsMPL.MPL_FUNCTION_DEFN functiondefn -> failure x
   MplLanguage.AbsMPL.MPL_PROCESS_DEFN processdefn -> failure x
   MplLanguage.AbsMPL.MPL_IMPORT_DEFN importdefn -> failure x
+  MplLanguage.AbsMPL.MPL_TYPECLASS_DEFN typeclassdefn -> failure x
+  MplLanguage.AbsMPL.MPL_INSTANCE_DEFN typeclassinstancedefn -> failure x
   MplLanguage.AbsMPL.MPL_DEFNTEST -> failure x
 
 transMplType :: MplLanguage.AbsMPL.MplType -> Result
@@ -457,3 +459,28 @@ transImportDefn x = case x of
   MplLanguage.AbsMPL.IMPORT_DIR_DEFN pstring colon uident -> failure x
   MplLanguage.AbsMPL.IMPORT_SPEC_DEFN uident lbracket pidents1 pidents2 rbracket -> failure x
   MplLanguage.AbsMPL.IMPORT_DEFN uident -> failure x
+
+transClassPropSignature :: MplLanguage.AbsMPL.ClassPropSignature -> Result
+transClassPropSignature x = case x of
+  MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> failure x
+  MplLanguage.AbsMPL.PROCESS_SIGN pident mpltypes1 mpltypes2 mpltypes3 -> failure x
+
+transTypeConstraint :: MplLanguage.AbsMPL.TypeConstraint -> Result
+transTypeConstraint x = case x of
+  MplLanguage.AbsMPL.TYPE_CONSTRAINT uident mpltype -> failure x
+  MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER uident uidents mpltype -> failure x
+
+transTypeClassDefn :: MplLanguage.AbsMPL.TypeClassDefn -> Result
+transTypeClassDefn x = case x of
+  MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint classpropsignatures -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN typeconstraints typeconstraint classpropsignatures -> failure x
+
+transClassPropDefn :: MplLanguage.AbsMPL.ClassPropDefn -> Result
+transClassPropDefn x = case x of
+  MplLanguage.AbsMPL.FUNCTION_DEF functiondefn -> failure x
+  MplLanguage.AbsMPL.PROCESS_DEF processdefn -> failure x
+
+transTypeClassInstanceDefn :: MplLanguage.AbsMPL.TypeClassInstanceDefn -> Result
+transTypeClassInstanceDefn x = case x of
+  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN typeconstraint classpropdefns -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN typeconstraints typeconstraint classpropdefns -> failure x

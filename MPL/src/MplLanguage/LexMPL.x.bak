@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \, | \{ | \} | \; | \| | \- \> | \= | \: \: | \= \> | \. | \: \= | \( | \)
+@rsyms = \, | \{ | \} | \; | \| | \- \> | \= | \: \: | \= \> | \. | \: \= | \' \\
 
 :-
 
@@ -384,24 +384,26 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "if" 21
-    (b "and" 11
-       (b "::" 6
-          (b "," 3 (b ")" 2 (b "(" 1 N N) N) (b "." 5 (b "->" 4 N N) N))
-          (b "=" 9 (b ";" 8 (b ":=" 7 N N) N) (b "=>" 10 N N)))
-       (b "defn" 16
+  b "in" 22
+    (b "as" 11
+       (b ":=" 6
+          (b "->" 3 (b "," 2 (b "'\\" 1 N N) N) (b "::" 5 (b "." 4 N N) N))
+          (b "=>" 9 (b "=" 8 (b ";" 7 N N) N) (b "and" 10 N N)))
+       (b "do" 17
           (b "coprotocol" 14
-             (b "codata" 13 (b "as" 12 N N) N) (b "data" 15 N N))
-          (b "fold" 19 (b "else" 18 (b "do" 17 N N) N) (b "fun" 20 N N))))
-    (b "protocol" 32
-       (b "of" 27
-          (b "into" 24
-             (b "include" 23 (b "in" 22 N N) N) (b "neg" 26 (b "let" 25 N N) N))
-          (b "potato" 30 (b "plug" 29 (b "on" 28 N N) N) (b "proc" 31 N N)))
-       (b "where" 37
-          (b "then" 35
-             (b "switch" 34 (b "race" 33 N N) N) (b "unfold" 36 N N))
-          (b "|" 40 (b "{" 39 (b "with" 38 N N) N) (b "}" 41 N N))))
+             (b "codata" 13 (b "class" 12 N N) N)
+             (b "defn" 16 (b "data" 15 N N) N))
+          (b "fun" 20 (b "fold" 19 (b "else" 18 N N) N) (b "if" 21 N N))))
+    (b "protocol" 33
+       (b "of" 28
+          (b "into" 25
+             (b "instance" 24 (b "include" 23 N N) N)
+             (b "neg" 27 (b "let" 26 N N) N))
+          (b "potato" 31 (b "plug" 30 (b "on" 29 N N) N) (b "proc" 32 N N)))
+       (b "where" 38
+          (b "then" 36
+             (b "switch" 35 (b "race" 34 N N) N) (b "unfold" 37 N N))
+          (b "|" 41 (b "{" 40 (b "with" 39 N N) N) (b "}" 42 N N))))
   where
   b s n = B bs (TS bs n)
     where

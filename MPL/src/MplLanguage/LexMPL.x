@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \, | \{ | \} | \; | \| | \- \> | \= | \: \: | \= \> | \. | \: \=
+@rsyms = \, | \{ | \} | \; | \| | \- \> | \= | \: \: | \= \> | \. | \: \= | \\
 
 :-
 
@@ -384,23 +384,26 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "in" 20
-    (b "as" 10
-       (b ":=" 5
-          (b "." 3 (b "->" 2 (b "," 1 N N) N) (b "::" 4 N N))
-          (b "=>" 8 (b "=" 7 (b ";" 6 N N) N) (b "and" 9 N N)))
-       (b "do" 15
-          (b "data" 13
-             (b "coprotocol" 12 (b "codata" 11 N N) N) (b "defn" 14 N N))
-          (b "fun" 18 (b "fold" 17 (b "else" 16 N N) N) (b "if" 19 N N))))
-    (b "protocol" 30
-       (b "of" 25
-          (b "let" 23 (b "into" 22 (b "include" 21 N N) N) (b "neg" 24 N N))
-          (b "potato" 28 (b "plug" 27 (b "on" 26 N N) N) (b "proc" 29 N N)))
-       (b "where" 35
-          (b "then" 33
-             (b "switch" 32 (b "race" 31 N N) N) (b "unfold" 34 N N))
-          (b "|" 38 (b "{" 37 (b "with" 36 N N) N) (b "}" 39 N N))))
+  b "in" 22
+    (b "as" 11
+       (b ";" 6
+          (b "." 3 (b "->" 2 (b "," 1 N N) N) (b ":=" 5 (b "::" 4 N N) N))
+          (b "\\" 9 (b "=>" 8 (b "=" 7 N N) N) (b "and" 10 N N)))
+       (b "do" 17
+          (b "coprotocol" 14
+             (b "codata" 13 (b "class" 12 N N) N)
+             (b "defn" 16 (b "data" 15 N N) N))
+          (b "fun" 20 (b "fold" 19 (b "else" 18 N N) N) (b "if" 21 N N))))
+    (b "protocol" 33
+       (b "of" 28
+          (b "into" 25
+             (b "instance" 24 (b "include" 23 N N) N)
+             (b "neg" 27 (b "let" 26 N N) N))
+          (b "potato" 31 (b "plug" 30 (b "on" 29 N N) N) (b "proc" 32 N N)))
+       (b "where" 38
+          (b "then" 36
+             (b "switch" 35 (b "race" 34 N N) N) (b "unfold" 37 N N))
+          (b "|" 41 (b "{" 40 (b "with" 39 N N) N) (b "}" 42 N N))))
   where
   b s n = B bs (TS bs n)
     where

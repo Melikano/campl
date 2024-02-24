@@ -1,67 +1,68 @@
+{-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE QuasiQuotes #-}
-module MplPasses.Renamer.RenameSpec ( spec ) where
 
-import Optics
-
-import Test.Hspec
-import Test.QuickCheck
-import Test.HUnit
-import Text.RawString.QQ
-
-import MplAST.MplCore
-import MplPasses.Assertions
-
-import Data.Maybe
-import Data.List.NonEmpty ( NonEmpty (..) )
-import qualified Data.List.NonEmpty as NE
+module MplPasses.Renamer.RenameSpec (spec) where
 
 import Data.Either
+import Data.List.NonEmpty (NonEmpty (..))
+import Data.List.NonEmpty qualified as NE
+import Data.Maybe
 import Data.Traversable
-
-import qualified MplPasses.Parser.BnfcParse as B
+import MplAST.MplCore
+import MplPasses.Assertions
+import MplPasses.Env
+import MplPasses.Parser.BnfcParse qualified as B
 import MplPasses.Parser.Parse
-import MplPasses.PassesErrors
 import MplPasses.Parser.ParseErrors
+import MplPasses.Passes
+import MplPasses.PassesErrors
 import MplPasses.Renamer.Rename
 import MplPasses.Renamer.RenameErrors
+import MplPasses.Renamer.RenameSym qualified as R
+import Optics
+import Test.HUnit
+import Test.Hspec
+import Test.QuickCheck
+import Text.RawString.QQ
 
-import qualified MplPasses.Renamer.RenameSym as R
-import MplPasses.Passes
-import MplPasses.Env
-
--- Tests for overlapping declarations and out of scope errors 
+-- Tests for overlapping declarations and out of scope errors
 
 spec = do
-    mapM_ (`describeValidRename` const (return ()))
-        [ v1
-        , v2
-        , v3 
-        , v4 
-        , v5 
-        , v6 
-        , v7 
-        , v8 
-        , v9 
-        , v10 
-        , v11 
-        ]
+  mapM_
+    (`describeValidRename` const (return ()))
+    [ v1,
+      v2,
+      v3,
+      v4,
+      v5,
+      v6,
+      v7,
+      v8,
+      v9,
+      v10,
+      v11,
+      v12,
+      v13,
+      v14
+    ]
 
-    mapM_ (`describeAllErrors` ("out of scope", _MplRenameErrors % _OutOfScope))
-        [ n1
-        , n2
-        , n3 
-        , n4 
-        , n5 
-        , n6 
-        , n7 
-        , n8 
-        , n8 
-        ]
+  mapM_
+    (`describeAllErrors` ("out of scope", _MplRenameErrors % _OutOfScope))
+    [ n1,
+      n2,
+      n3,
+      n4,
+      n5,
+      n6,
+      n7,
+      n8,
+      n8
+    ]
 
-
--- Valid tests  
+-- Valid tests
 ----------------------------
-v1 = [r|
+v1 =
+  [r|
 proc v1 =
     | c => a -> do
         fork a as
@@ -75,7 +76,8 @@ proc v1 =
                 halt b 
 |]
 
-v2 = [r|
+v2 =
+  [r|
 proc v2 =
     | => a -> do
        fork a as
@@ -85,7 +87,8 @@ proc v2 =
                 halt b 
 |]
 
-v3 = [r|
+v3 =
+  [r|
 proc v3 =
     | => a -> do
         plug 
@@ -97,7 +100,8 @@ proc v3 =
                 halt a
 |]
 
-v4 = [r|
+v4 =
+  [r|
 defn
     fun test =
         a -> hehemut(a)
@@ -105,7 +109,8 @@ defn
         a -> a
 |]
 
-v5 = [r|
+v5 =
+  [r|
 codata 
     C -> App(A,B) =
         App :: A,C -> B
@@ -113,7 +118,8 @@ fun appwrapper =
     (App := f), a -> f(a)
 |]
 
-v6 = [r|
+v6 =
+  [r|
 data
     MyData(A,B) -> C =
         MyData :: A,B -> C
@@ -123,8 +129,8 @@ fun appwrapper =
         MyData(_,_) -> a
 |]
 
-
-v7 = [r|
+v7 =
+  [r|
 data
     MyData(A,B) -> C =
         MyData :: A,B -> C
@@ -135,7 +141,8 @@ fun v7 :: B,MyData(A,A) -> A =
         MyData(_,_) -> a
 |]
 
-v8 = [r|
+v8 =
+  [r|
 data
     MyData(A,B,D) -> C =
         MyData1 :: A,B,D -> C
@@ -146,12 +153,14 @@ data
         Other :: A,B,C -> E
 |]
 
-v9 = [r|
+v9 =
+  [r|
 fun testing =
     a -> testing(a)
 |]
 
-v10 = [r|
+v10 =
+  [r|
 fun testing =
     a -> 
         let fun wow =
@@ -159,7 +168,8 @@ fun testing =
         in wow(a)
 |]
 
-v11 = [r|
+v11 =
+  [r|
 defn 
     fun v11 =
         a -> pow(a)
@@ -171,10 +181,69 @@ where
         a -> wow(a)
 |]
 
+-- testing sequential first order type classes
+v12 =
+  [r|
+class Eq A where
+  fun eq :: A, A -> Bool
 
--- Invalid tests  
+class Eq A => Ord A where
+    fun gt :: A, A -> Bool
+    fun lt :: A, A -> Bool
+
+instance Ord A => Ord [A] where
+    fun gt =
+        x, y -> True
+|]
+
+-- testing sequential higher order type classes
+v13 =
+  [r|
+class Functor \X -> M(X) => Monad \X -> M(X) where
+  fun return :: A -> M(A)
+  fun bind :: M(A), Fun(A,M(B)) -> M(B) 
+
+instance Functor \A -> Tree(A, B) => Monad \A -> Tree(A, B) where
+  fun return =
+    x -> Leaf(x)
+  fun bind =
+    Node(x), f -> f(x)
+    leaf, _ -> leaf
+
+class Map2 \A, B -> M(A, B) where
+  fun map1 :: Fun(A,C), M(A,B) -> M(C,B) 
+  fun map2 :: Fun(B,C), M(A,B) -> M(A,C)
+
+instance Map2 \A, B -> Tree(A, B) where
+  fun map1 = 
+    f, Node(x) -> Node(f(x))
+    _, leaf -> leaf
+  fun map2 =
+    f, Leaf(x) -> Leaf(f(x))
+    _, node -> node
+|]
+
+-- testing concurrent first order type classes
+v14 =
+  [r|
+class Kill T where
+  proc kill :: | T =>
+
+instance Kill TopBot where
+  proc kill :: | TopBot => =
+    | ch => -> halt ch
+
+instance Kill T => Kill Get(A | T) where
+  proc kill :: | Get(A | T) => =
+    | ch => -> do
+      put a on ch
+      kill( | ch => )
+|]
+
+-- Invalid tests
 ----------------------------
-n1 = [r|
+n1 =
+  [r|
 proc n1 =
     | => a -> do
        fork a as
@@ -184,7 +253,8 @@ proc n1 =
                 halt b 
 |]
 
-n2 = [r|
+n2 =
+  [r|
 proc n2 =
     | => a -> do
        fork a as
@@ -194,7 +264,8 @@ proc n2 =
                 halt c 
 |]
 
-n3 = [r|
+n3 =
+  [r|
 proc n3 =
     | => a -> do
         plug 
@@ -211,7 +282,8 @@ proc n3 =
                 halt c
 |]
 
-n4 = [r|
+n4 =
+  [r|
 fun test =
     a -> hehemut(a)
 
@@ -219,20 +291,23 @@ fun hehemut =
     a -> a
 |]
 
-n5 = [r|
+n5 =
+  [r|
 fun n5 =
     a -> a
     b -> a
 |]
 
-n6 = [r|
+n6 =
+  [r|
 data
     MyData(A,B) -> C =
         MyData1 :: A,B,D -> C
         MyData2 :: A,B,D -> C
 |]
 
-n7 = [r|
+n7 =
+  [r|
 defn 
     fun n7 =
         a -> pow(a)
@@ -243,7 +318,8 @@ where
         a -> a
 |]
 
-n8 = [r|
+n8 =
+  [r|
 defn 
     fun n8 =
         a -> pow(a)
@@ -255,7 +331,8 @@ fun whereoutofscope =
     a -> pow(a)
 |]
 
-n9 = [r|
+n9 =
+  [r|
 defn 
     fun n9 =
         a -> 
