@@ -31,37 +31,40 @@ import MplLanguage.LexMPL
   ';'              { PT _ (TS _ 6)             }
   '='              { PT _ (TS _ 7)             }
   '=>'             { PT _ (TS _ 8)             }
-  'and'            { PT _ (TS _ 9)             }
-  'as'             { PT _ (TS _ 10)            }
-  'codata'         { PT _ (TS _ 11)            }
-  'coprotocol'     { PT _ (TS _ 12)            }
-  'data'           { PT _ (TS _ 13)            }
-  'defn'           { PT _ (TS _ 14)            }
-  'do'             { PT _ (TS _ 15)            }
-  'else'           { PT _ (TS _ 16)            }
-  'fold'           { PT _ (TS _ 17)            }
-  'fun'            { PT _ (TS _ 18)            }
-  'if'             { PT _ (TS _ 19)            }
-  'in'             { PT _ (TS _ 20)            }
-  'include'        { PT _ (TS _ 21)            }
-  'into'           { PT _ (TS _ 22)            }
-  'let'            { PT _ (TS _ 23)            }
-  'neg'            { PT _ (TS _ 24)            }
-  'of'             { PT _ (TS _ 25)            }
-  'on'             { PT _ (TS _ 26)            }
-  'plug'           { PT _ (TS _ 27)            }
-  'potato'         { PT _ (TS _ 28)            }
-  'proc'           { PT _ (TS _ 29)            }
-  'protocol'       { PT _ (TS _ 30)            }
-  'race'           { PT _ (TS _ 31)            }
-  'switch'         { PT _ (TS _ 32)            }
-  'then'           { PT _ (TS _ 33)            }
-  'unfold'         { PT _ (TS _ 34)            }
-  'where'          { PT _ (TS _ 35)            }
-  'with'           { PT _ (TS _ 36)            }
-  '{'              { PT _ (TS _ 37)            }
-  '|'              { PT _ (TS _ 38)            }
-  '}'              { PT _ (TS _ 39)            }
+  '\\'             { PT _ (TS _ 9)             }
+  'and'            { PT _ (TS _ 10)            }
+  'as'             { PT _ (TS _ 11)            }
+  'class'          { PT _ (TS _ 12)            }
+  'codata'         { PT _ (TS _ 13)            }
+  'coprotocol'     { PT _ (TS _ 14)            }
+  'data'           { PT _ (TS _ 15)            }
+  'defn'           { PT _ (TS _ 16)            }
+  'do'             { PT _ (TS _ 17)            }
+  'else'           { PT _ (TS _ 18)            }
+  'fold'           { PT _ (TS _ 19)            }
+  'fun'            { PT _ (TS _ 20)            }
+  'if'             { PT _ (TS _ 21)            }
+  'in'             { PT _ (TS _ 22)            }
+  'include'        { PT _ (TS _ 23)            }
+  'instance'       { PT _ (TS _ 24)            }
+  'into'           { PT _ (TS _ 25)            }
+  'let'            { PT _ (TS _ 26)            }
+  'neg'            { PT _ (TS _ 27)            }
+  'of'             { PT _ (TS _ 28)            }
+  'on'             { PT _ (TS _ 29)            }
+  'plug'           { PT _ (TS _ 30)            }
+  'potato'         { PT _ (TS _ 31)            }
+  'proc'           { PT _ (TS _ 32)            }
+  'protocol'       { PT _ (TS _ 33)            }
+  'race'           { PT _ (TS _ 34)            }
+  'switch'         { PT _ (TS _ 35)            }
+  'then'           { PT _ (TS _ 36)            }
+  'unfold'         { PT _ (TS _ 37)            }
+  'where'          { PT _ (TS _ 38)            }
+  'with'           { PT _ (TS _ 39)            }
+  '{'              { PT _ (TS _ 40)            }
+  '|'              { PT _ (TS _ 41)            }
+  '}'              { PT _ (TS _ 42)            }
   L_PInteger       { PT _ (T_PInteger _)       }
   L_PDouble        { PT _ (T_PDouble _)        }
   L_PChar          { PT _ (T_PChar _)          }
@@ -260,6 +263,8 @@ MplDefn
   | FunctionDefn { MplLanguage.AbsMPL.MPL_FUNCTION_DEFN $1 }
   | ProcessDefn { MplLanguage.AbsMPL.MPL_PROCESS_DEFN $1 }
   | ImportDefn { MplLanguage.AbsMPL.MPL_IMPORT_DEFN $1 }
+  | TypeClassDefn { MplLanguage.AbsMPL.MPL_TYPECLASS_DEFN $1 }
+  | TypeClassInstanceDefn { MplLanguage.AbsMPL.MPL_INSTANCE_DEFN $1 }
   | 'potato' { MplLanguage.AbsMPL.MPL_DEFNTEST }
 
 MplType :: { MplLanguage.AbsMPL.MplType }
@@ -726,6 +731,50 @@ ImportDefn
   | 'include' PString Colon UIdent { MplLanguage.AbsMPL.IMPORT_DIR_DEFN $2 $3 $4 }
   | 'include' UIdent LBracket ListPIdent '|' ListPIdent RBracket { MplLanguage.AbsMPL.IMPORT_SPEC_DEFN $2 $3 $4 $6 $7 }
   | 'include' UIdent { MplLanguage.AbsMPL.IMPORT_DEFN $2 }
+
+ClassPropSignature :: { MplLanguage.AbsMPL.ClassPropSignature }
+ClassPropSignature
+  : 'fun' PIdent '::' ListMplType '->' MplType { MplLanguage.AbsMPL.FUNCTION_SIGN $2 $4 $6 }
+  | 'proc' PIdent '::' ListMplType '|' ListMplType '=>' ListMplType { MplLanguage.AbsMPL.PROCESS_SIGN $2 $4 $6 $8 }
+
+TypeConstraint :: { MplLanguage.AbsMPL.TypeConstraint }
+TypeConstraint
+  : UIdent MplType { MplLanguage.AbsMPL.TYPE_CONSTRAINT $1 $2 }
+  | UIdent '\\' ListUIdent '->' MplType { MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER $1 $3 $5 }
+
+TypeClassDefn :: { MplLanguage.AbsMPL.TypeClassDefn }
+TypeClassDefn
+  : 'class' TypeConstraint 'where' '{' ListClassPropSignature '}' { MplLanguage.AbsMPL.TYPECLASS_DEFN $2 $5 }
+  | 'class' ListTypeConstraint '=>' TypeConstraint 'where' '{' ListClassPropSignature '}' { MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN $2 $4 $7 }
+
+ListClassPropSignature :: { [MplLanguage.AbsMPL.ClassPropSignature] }
+ListClassPropSignature
+  : ClassPropSignature { (:[]) $1 }
+  | ClassPropSignature ';' ListClassPropSignature { (:) $1 $3 }
+
+ListUIdent :: { [MplLanguage.AbsMPL.UIdent] }
+ListUIdent
+  : UIdent { (:[]) $1 } | UIdent ',' ListUIdent { (:) $1 $3 }
+
+ClassPropDefn :: { MplLanguage.AbsMPL.ClassPropDefn }
+ClassPropDefn
+  : FunctionDefn { MplLanguage.AbsMPL.FUNCTION_DEF $1 }
+  | ProcessDefn { MplLanguage.AbsMPL.PROCESS_DEF $1 }
+
+TypeClassInstanceDefn :: { MplLanguage.AbsMPL.TypeClassInstanceDefn }
+TypeClassInstanceDefn
+  : 'instance' TypeConstraint 'where' '{' ListClassPropDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN $2 $5 }
+  | 'instance' ListTypeConstraint '=>' TypeConstraint 'where' '{' ListClassPropDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN $2 $4 $7 }
+
+ListTypeConstraint :: { [MplLanguage.AbsMPL.TypeConstraint] }
+ListTypeConstraint
+  : TypeConstraint { (:[]) $1 }
+  | TypeConstraint ',' ListTypeConstraint { (:) $1 $3 }
+
+ListClassPropDefn :: { [MplLanguage.AbsMPL.ClassPropDefn] }
+ListClassPropDefn
+  : ClassPropDefn { (:[]) $1 }
+  | ClassPropDefn ';' ListClassPropDefn { (:) $1 $3 }
 
 {
 
