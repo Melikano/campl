@@ -446,20 +446,26 @@ All other symbols are terminals.
   |  |  **|**  | ``include`` //PString// //Colon// //UIdent//
   |  |  **|**  | ``include`` //UIdent// //LBracket// //[PIdent]// ``|`` //[PIdent]// //RBracket//
   |  |  **|**  | ``include`` //UIdent//
-  | //ClassPropSignature// | -> | ``fun`` //PIdent// ``::`` //[MplType]// ``->`` //MplType//
-  |  |  **|**  | ``proc`` //PIdent// ``::`` //[MplType]// ``|`` //[MplType]// ``=>`` //[MplType]//
+  | //FunClassProp// | -> | ``fun`` //PIdent// ``::`` //[MplType]// ``->`` //MplType//
+  |  |  **|**  | ``fun`` //PIdent// ``::`` //[MplType]// ``->`` //MplType// ``=`` ``{`` //[PattExprPhrase]// ``}``
+  | //ProcClassProp// | -> | ``proc`` //PIdent// ``::`` //[MplType]// ``|`` //[MplType]// ``=>`` //[MplType]//
+  |  |  **|**  | ``proc`` //PIdent// ``::`` //[MplType]// ``|`` //[MplType]// ``=>`` //[MplType]// ``=`` ``{`` //[ProcessPhrase]// ``}``
+  | //ClassProp// | -> | //ProcClassProp//
+  |  |  **|**  | //FunClassProp//
   | //TypeConstraint// | -> | //UIdent// //MplType//
   |  |  **|**  | //UIdent// ``\`` //[UIdent]// ``->`` //MplType//
-  | //TypeClassDefn// | -> | ``class`` //TypeConstraint// ``where`` ``{`` //[ClassPropSignature]// ``}``
-  |  |  **|**  | ``class`` //[TypeConstraint]// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassPropSignature]// ``}``
-  | //[ClassPropSignature]// | -> | //ClassPropSignature//
-  |  |  **|**  | //ClassPropSignature// ``;`` //[ClassPropSignature]//
+  | //SuperClasses// | -> | //[TypeConstraint]//
+  |  |  **|**  | //[TypeConstraint]// ``|`` //[TypeConstraint]//
+  | //TypeClassDefn// | -> | ``class`` //TypeConstraint// ``where`` ``{`` //[ClassProp]// ``}``
+  |  |  **|**  | ``class`` //SuperClasses// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassProp]// ``}``
+  | //[ClassProp]// | -> | //ClassProp//
+  |  |  **|**  | //ClassProp// ``;`` //[ClassProp]//
   | //[UIdent]// | -> | //UIdent//
   |  |  **|**  | //UIdent// ``,`` //[UIdent]//
   | //ClassPropDefn// | -> | //FunctionDefn//
   |  |  **|**  | //ProcessDefn//
   | //TypeClassInstanceDefn// | -> | ``instance`` //TypeConstraint// ``where`` ``{`` //[ClassPropDefn]// ``}``
-  |  |  **|**  | ``instance`` //[TypeConstraint]// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassPropDefn]// ``}``
+  |  |  **|**  | ``instance`` //SuperClasses// ``=>`` //TypeConstraint// ``where`` ``{`` //[ClassPropDefn]// ``}``
   | //[TypeConstraint]// | -> | //TypeConstraint//
   |  |  **|**  | //TypeConstraint// ``,`` //[TypeConstraint]//
   | //[ClassPropDefn]// | -> | //ClassPropDefn//

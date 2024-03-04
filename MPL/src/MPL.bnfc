@@ -546,19 +546,33 @@ IMPORT_DEFN           . ImportDefn ::= "include"               UIdent           
 -- ====================================================================
 --  MPL typeclass definition
 -- ====================================================================
-FUNCTION_SIGN . ClassPropSignature ::= "fun" PIdent "::" [MplType] "->" MplType ; 
-PROCESS_SIGN . ClassPropSignature ::= "proc" PIdent "::" [MplType]  "|" [MplType] "=>" [MplType] ;
+FUNCTION_SIGN . FunClassProp ::= "fun" PIdent "::" [MplType] "->" MplType ; 
+FUNCTION_IMPL . FunClassProp ::= 
+    "fun" PIdent "::" [MplType] "->" MplType 
+        "=" "{" [ PattExprPhrase ]"}" ; ;
+
+PROCESS_SIGN . ProcClassProp ::= "proc" PIdent "::" [MplType]  "|" [MplType] "=>" [MplType] ;
+PROCESS_IMPL . ProcClassProp ::=     
+    "proc" PIdent "::" [MplType]  "|" [MplType] "=>" [MplType]
+        "=" "{" [ProcessPhrase] "}" ;
+
+PROC_CLASS_PROP . ClassProp ::= ProcClassProp ;
+FUN_CLASS_PROP . ClassProp ::= FunClassProp ;
 
 TYPE_CONSTRAINT . TypeConstraint ::= UIdent MplType ;
 TYPE_CONSTRAINT_HIGHER_ORDER . TypeConstraint ::= UIdent "\\" [UIdent] "->" MplType ;
 
+SUPER_CLASSES_SEQ . SuperClasses ::= [TypeConstraint] ;
+SUPER_CLASSES_CONC . SuperClasses ::= [TypeConstraint] "|" [TypeConstraint] ;
+
+
 TYPECLASS_DEFN . TypeClassDefn ::= 
-    "class" TypeConstraint "where" "{" [ ClassPropSignature ]"}" ;
+    "class" TypeConstraint "where" "{" [ ClassProp ]"}" ;
 
 TYPECLASS_SUPERCLASS_DEFN . TypeClassDefn ::= 
-    "class" [TypeConstraint] "=>" TypeConstraint "where" "{" [ ClassPropSignature ]"}";
+    "class" SuperClasses "=>" TypeConstraint "where" "{" [ ClassProp ]"}";
 
-separator nonempty ClassPropSignature ";" ;
+separator nonempty ClassProp ";" ;
 separator nonempty UIdent ",";
 -- ====================================================================
 --  MPL typeclass instance definition
@@ -571,7 +585,7 @@ TYPECLASS_INSTANCE_DEFN . TypeClassInstanceDefn ::=
     "instance" TypeConstraint "where" "{" [ ClassPropDefn ]"}";
 
 TYPECLASS_INSTANCE_DEPENDENCY_DEFN . TypeClassInstanceDefn ::=
-    "instance" [TypeConstraint] "=>" TypeConstraint "where" "{" [ ClassPropDefn ]"}";
+    "instance" SuperClasses "=>" TypeConstraint "where" "{" [ ClassPropDefn ]"}";
 
 
 separator nonempty TypeConstraint "," ;

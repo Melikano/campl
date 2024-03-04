@@ -43,7 +43,8 @@ spec = do
       v11,
       v12,
       v13,
-      v14
+      v14,
+      v15
     ]
 
   mapM_
@@ -196,8 +197,24 @@ instance Ord A => Ord [A] where
         x, y -> True
 |]
 
--- testing sequential higher order type classes
+-- testing type class defns
 v13 =
+  [r|
+class Functor \X -> M(X) => Monad \X -> M(X) where
+  fun return :: A -> M(A)
+  fun bind :: M(A), Fun(A,M(B)) -> M(B) 
+
+class Map2 \A, B -> M(A, B) where
+  fun map1 :: Fun(A,C), M(A,B) -> M(C,B) 
+  fun map2 :: Fun(B,C), M(A,B) -> M(A,C)
+
+class Kill T where
+  proc kill :: | T =>
+
+|]
+
+-- testing sequential higher order type classes
+v14 =
   [r|
 class Functor \X -> M(X) => Monad \X -> M(X) where
   fun return :: A -> M(A)
@@ -224,7 +241,7 @@ instance Map2 \A, B -> Tree(A, B) where
 |]
 
 -- testing concurrent first order type classes
-v14 =
+v15 =
   [r|
 class Kill T where
   proc kill :: | T =>

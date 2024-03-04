@@ -673,21 +673,29 @@ instance Print MplLanguage.AbsMPL.ImportDefn where
     MplLanguage.AbsMPL.IMPORT_SPEC_DEFN uident lbracket pidents1 pidents2 rbracket -> prPrec i 0 (concatD [doc (showString "include"), prt 0 uident, prt 0 lbracket, prt 0 pidents1, doc (showString "|"), prt 0 pidents2, prt 0 rbracket])
     MplLanguage.AbsMPL.IMPORT_DEFN uident -> prPrec i 0 (concatD [doc (showString "include"), prt 0 uident])
 
-instance Print MplLanguage.AbsMPL.FunctionSignature where
+instance Print MplLanguage.AbsMPL.ClassProp where
   prt i = \case
     MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltypes, doc (showString "->"), prt 0 mpltype])
+    MplLanguage.AbsMPL.PROCESS_SIGN pident mpltypes1 mpltypes2 mpltypes3 -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltypes1, doc (showString "|"), prt 0 mpltypes2, doc (showString "=>"), prt 0 mpltypes3])
+    MplLanguage.AbsMPL.FUNCTION_IMPL pident mpltypes mpltype pattexprphrases -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltypes, doc (showString "->"), prt 0 mpltype, doc (showString "="), doc (showString "{"), prt 0 pattexprphrases, doc (showString "}")])
+    MplLanguage.AbsMPL.PROCESS_IMPL pident mpltypes1 mpltypes2 mpltypes3 processphrases -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltypes1, doc (showString "|"), prt 0 mpltypes2, doc (showString "=>"), prt 0 mpltypes3, doc (showString "="), doc (showString "{"), prt 0 processphrases, doc (showString "}")])
 
 instance Print MplLanguage.AbsMPL.TypeConstraint where
   prt i = \case
     MplLanguage.AbsMPL.TYPE_CONSTRAINT uident mpltype -> prPrec i 0 (concatD [prt 0 uident, prt 0 mpltype])
     MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER uident uidents mpltype -> prPrec i 0 (concatD [prt 0 uident, doc (showString "\\"), prt 0 uidents, doc (showString "->"), prt 0 mpltype])
 
+instance Print MplLanguage.AbsMPL.SuperClasses where
+  prt i = \case
+    MplLanguage.AbsMPL.SUPER_CLASSES_SEQ typeconstraints -> prPrec i 0 (concatD [prt 0 typeconstraints])
+    MplLanguage.AbsMPL.SUPER_CLASSES_CONC typeconstraints1 typeconstraints2 -> prPrec i 0 (concatD [prt 0 typeconstraints1, doc (showString "|"), prt 0 typeconstraints2])
+
 instance Print MplLanguage.AbsMPL.TypeClassDefn where
   prt i = \case
-    MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint functionsignatures -> prPrec i 0 (concatD [doc (showString "class"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 functionsignatures, doc (showString "}")])
-    MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN typeconstraints typeconstraint functionsignatures -> prPrec i 0 (concatD [doc (showString "class"), prt 0 typeconstraints, doc (showString "=>"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 functionsignatures, doc (showString "}")])
+    MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint classprops -> prPrec i 0 (concatD [doc (showString "class"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 classprops, doc (showString "}")])
+    MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN superclasses typeconstraint classprops -> prPrec i 0 (concatD [doc (showString "class"), prt 0 superclasses, doc (showString "=>"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 classprops, doc (showString "}")])
 
-instance Print [MplLanguage.AbsMPL.FunctionSignature] where
+instance Print [MplLanguage.AbsMPL.ClassProp] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ";"), prt 0 xs]
@@ -697,17 +705,22 @@ instance Print [MplLanguage.AbsMPL.UIdent] where
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
+instance Print MplLanguage.AbsMPL.ClassPropDefn where
+  prt i = \case
+    MplLanguage.AbsMPL.FUNCTION_DEF functiondefn -> prPrec i 0 (concatD [prt 0 functiondefn])
+    MplLanguage.AbsMPL.PROCESS_DEF processdefn -> prPrec i 0 (concatD [prt 0 processdefn])
+
 instance Print MplLanguage.AbsMPL.TypeClassInstanceDefn where
   prt i = \case
-    MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN typeconstraint functiondefns -> prPrec i 0 (concatD [doc (showString "instance"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 functiondefns, doc (showString "}")])
-    MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN typeconstraints typeconstraint functiondefns -> prPrec i 0 (concatD [doc (showString "instance"), prt 0 typeconstraints, doc (showString "=>"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 functiondefns, doc (showString "}")])
+    MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN typeconstraint classpropdefns -> prPrec i 0 (concatD [doc (showString "instance"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 classpropdefns, doc (showString "}")])
+    MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN superclasses typeconstraint classpropdefns -> prPrec i 0 (concatD [doc (showString "instance"), prt 0 superclasses, doc (showString "=>"), prt 0 typeconstraint, doc (showString "where"), doc (showString "{"), prt 0 classpropdefns, doc (showString "}")])
 
 instance Print [MplLanguage.AbsMPL.TypeConstraint] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
-instance Print [MplLanguage.AbsMPL.FunctionDefn] where
+instance Print [MplLanguage.AbsMPL.ClassPropDefn] where
   prt _ [] = concatD []
   prt _ [x] = concatD [prt 0 x]
   prt _ (x:xs) = concatD [prt 0 x, doc (showString ";"), prt 0 xs]

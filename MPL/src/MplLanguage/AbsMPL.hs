@@ -284,9 +284,18 @@ data ImportDefn
     | IMPORT_DEFN UIdent
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data ClassPropSignature
+data FunClassProp
     = FUNCTION_SIGN PIdent [MplType] MplType
-    | PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
+    | FUNCTION_IMPL PIdent [MplType] MplType [PattExprPhrase]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ProcClassProp
+    = PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
+    | PROCESS_IMPL PIdent [MplType] [MplType] [MplType] [ProcessPhrase]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ClassProp
+    = PROC_CLASS_PROP ProcClassProp | FUN_CLASS_PROP FunClassProp
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data TypeConstraint
@@ -294,9 +303,14 @@ data TypeConstraint
     | TYPE_CONSTRAINT_HIGHER_ORDER UIdent [UIdent] MplType
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
+data SuperClasses
+    = SUPER_CLASSES_SEQ [TypeConstraint]
+    | SUPER_CLASSES_CONC [TypeConstraint] [TypeConstraint]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
 data TypeClassDefn
-    = TYPECLASS_DEFN TypeConstraint [ClassPropSignature]
-    | TYPECLASS_SUPERCLASS_DEFN [TypeConstraint] TypeConstraint [ClassPropSignature]
+    = TYPECLASS_DEFN TypeConstraint [ClassProp]
+    | TYPECLASS_SUPERCLASS_DEFN SuperClasses TypeConstraint [ClassProp]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data ClassPropDefn
@@ -305,7 +319,7 @@ data ClassPropDefn
 
 data TypeClassInstanceDefn
     = TYPECLASS_INSTANCE_DEFN TypeConstraint [ClassPropDefn]
-    | TYPECLASS_INSTANCE_DEPENDENCY_DEFN [TypeConstraint] TypeConstraint [ClassPropDefn]
+    | TYPECLASS_INSTANCE_DEPENDENCY_DEFN SuperClasses TypeConstraint [ClassPropDefn]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 newtype PInteger = PInteger ((C.Int, C.Int), String)
