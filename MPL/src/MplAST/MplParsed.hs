@@ -87,6 +87,10 @@ type instance XFunctionDefn MplParsed = MplFunction MplParsed
 type instance XProcessDefn MplParsed  = MplProcess MplParsed
 
 
+type instance XSeqTypeClassDefn MplParsed  = MplSeqTypeClass MplParsed
+type instance XConcTypeClassDefn MplParsed  = MplConcTypeClass MplParsed
+
+
 -- Expression instances
 type instance XMplExpr MplParsed = MplExpr MplParsed
 type instance XEPOps MplParsed = Location

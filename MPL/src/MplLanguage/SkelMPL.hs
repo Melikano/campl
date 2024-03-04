@@ -460,20 +460,35 @@ transImportDefn x = case x of
   MplLanguage.AbsMPL.IMPORT_SPEC_DEFN uident lbracket pidents1 pidents2 rbracket -> failure x
   MplLanguage.AbsMPL.IMPORT_DEFN uident -> failure x
 
-transClassPropSignature :: MplLanguage.AbsMPL.ClassPropSignature -> Result
-transClassPropSignature x = case x of
+transFunClassProp :: MplLanguage.AbsMPL.FunClassProp -> Result
+transFunClassProp x = case x of
   MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> failure x
+  MplLanguage.AbsMPL.FUNCTION_IMPL pident mpltypes mpltype pattexprphrases -> failure x
+
+transProcClassProp :: MplLanguage.AbsMPL.ProcClassProp -> Result
+transProcClassProp x = case x of
   MplLanguage.AbsMPL.PROCESS_SIGN pident mpltypes1 mpltypes2 mpltypes3 -> failure x
+  MplLanguage.AbsMPL.PROCESS_IMPL pident mpltypes1 mpltypes2 mpltypes3 processphrases -> failure x
+
+transClassProp :: MplLanguage.AbsMPL.ClassProp -> Result
+transClassProp x = case x of
+  MplLanguage.AbsMPL.PROC_CLASS_PROP procclassprop -> failure x
+  MplLanguage.AbsMPL.FUN_CLASS_PROP funclassprop -> failure x
 
 transTypeConstraint :: MplLanguage.AbsMPL.TypeConstraint -> Result
 transTypeConstraint x = case x of
   MplLanguage.AbsMPL.TYPE_CONSTRAINT uident mpltype -> failure x
   MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER uident uidents mpltype -> failure x
 
+transSuperClasses :: MplLanguage.AbsMPL.SuperClasses -> Result
+transSuperClasses x = case x of
+  MplLanguage.AbsMPL.SUPER_CLASSES_SEQ typeconstraints -> failure x
+  MplLanguage.AbsMPL.SUPER_CLASSES_CONC typeconstraints1 typeconstraints2 -> failure x
+
 transTypeClassDefn :: MplLanguage.AbsMPL.TypeClassDefn -> Result
 transTypeClassDefn x = case x of
-  MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint classpropsignatures -> failure x
-  MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN typeconstraints typeconstraint classpropsignatures -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_DEFN typeconstraint classprops -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN superclasses typeconstraint classprops -> failure x
 
 transClassPropDefn :: MplLanguage.AbsMPL.ClassPropDefn -> Result
 transClassPropDefn x = case x of
@@ -483,4 +498,4 @@ transClassPropDefn x = case x of
 transTypeClassInstanceDefn :: MplLanguage.AbsMPL.TypeClassInstanceDefn -> Result
 transTypeClassInstanceDefn x = case x of
   MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN typeconstraint classpropdefns -> failure x
-  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN typeconstraints typeconstraint classpropdefns -> failure x
+  MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN superclasses typeconstraint classpropdefns -> failure x

@@ -62,6 +62,9 @@ type instance XCoprotocolDefn MplPatternCompiled  =
 type instance XFunctionDefn MplPatternCompiled = MplFunction MplPatternCompiled
 type instance XProcessDefn MplPatternCompiled  = MplProcess MplPatternCompiled 
 
+type instance XSeqTypeClassDefn MplPatternCompiled  = MplSeqTypeClass MplPatternCompiled
+type instance XConcTypeClassDefn MplPatternCompiled  = MplConcTypeClass MplPatternCompiled
+
 -- Expression instances
 type instance XMplExpr MplPatternCompiled = MplExpr MplPatternCompiled
 type instance XEPOps MplPatternCompiled = XEPOps MplTypeChecked
@@ -228,6 +231,7 @@ type instance XFunType MplPatternCompiled  =
     ([TypeP MplTypeChecked], [XMplType MplTypeChecked], XMplType MplTypeChecked)
 type instance XProcType MplPatternCompiled = 
     ([TypeP MplPatternCompiled], [XMplType MplPatternCompiled], [XMplType MplPatternCompiled], [XMplType MplPatternCompiled])
+
 
 type instance XTypeSeqWithArgs MplPatternCompiled = MplSeqObjDefn MplPatternCompiled
 type instance XTypeSeqVarWithArgs MplPatternCompiled = Void -- higher kinded types are not allowed (for now)

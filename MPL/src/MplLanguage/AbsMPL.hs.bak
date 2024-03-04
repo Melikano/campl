@@ -284,7 +284,11 @@ data ImportDefn
     | IMPORT_DEFN UIdent
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data FunctionSignature = FUNCTION_SIGN PIdent [MplType] MplType
+data ClassProp
+    = FUNCTION_SIGN PIdent [MplType] MplType
+    | PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
+    | FUNCTION_IMPL PIdent [MplType] MplType [PattExprPhrase]
+    | PROCESS_IMPL PIdent [MplType] [MplType] [MplType] [ProcessPhrase]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data TypeConstraint
@@ -292,14 +296,23 @@ data TypeConstraint
     | TYPE_CONSTRAINT_HIGHER_ORDER UIdent [UIdent] MplType
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
+data SuperClasses
+    = SUPER_CLASSES_SEQ [TypeConstraint]
+    | SUPER_CLASSES_CONC [TypeConstraint] [TypeConstraint]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
 data TypeClassDefn
-    = TYPECLASS_DEFN TypeConstraint [FunctionSignature]
-    | TYPECLASS_SUPERCLASS_DEFN [TypeConstraint] TypeConstraint [FunctionSignature]
+    = TYPECLASS_DEFN TypeConstraint [ClassProp]
+    | TYPECLASS_SUPERCLASS_DEFN SuperClasses TypeConstraint [ClassProp]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ClassPropDefn
+    = FUNCTION_DEF FunctionDefn | PROCESS_DEF ProcessDefn
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data TypeClassInstanceDefn
-    = TYPECLASS_INSTANCE_DEFN TypeConstraint [FunctionDefn]
-    | TYPECLASS_INSTANCE_DEPENDENCY_DEFN [TypeConstraint] TypeConstraint [FunctionDefn]
+    = TYPECLASS_INSTANCE_DEFN TypeConstraint [ClassPropDefn]
+    | TYPECLASS_INSTANCE_DEPENDENCY_DEFN SuperClasses TypeConstraint [ClassPropDefn]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 newtype PInteger = PInteger ((C.Int, C.Int), String)

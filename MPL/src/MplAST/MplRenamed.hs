@@ -127,7 +127,10 @@ type instance XCoprotocolDefn MplRenamed  =
     MplTypeClauseSpine MplRenamed (ConcObjTag CoprotocolDefnTag)
 
 type instance XFunctionDefn MplRenamed = MplFunction MplRenamed
-type instance XProcessDefn MplRenamed  = MplProcess MplRenamed 
+type instance XProcessDefn MplRenamed  = MplProcess MplRenamed
+
+type instance XSeqTypeClassDefn MplRenamed  = MplSeqTypeClass MplRenamed
+type instance XConcTypeClassDefn MplRenamed  = MplConcTypeClass MplRenamed
 
 
 -- Expression instances

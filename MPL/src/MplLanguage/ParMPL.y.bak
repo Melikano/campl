@@ -732,43 +732,56 @@ ImportDefn
   | 'include' UIdent LBracket ListPIdent '|' ListPIdent RBracket { MplLanguage.AbsMPL.IMPORT_SPEC_DEFN $2 $3 $4 $6 $7 }
   | 'include' UIdent { MplLanguage.AbsMPL.IMPORT_DEFN $2 }
 
-FunctionSignature :: { MplLanguage.AbsMPL.FunctionSignature }
-FunctionSignature
+ClassProp :: { MplLanguage.AbsMPL.ClassProp }
+ClassProp
   : 'fun' PIdent '::' ListMplType '->' MplType { MplLanguage.AbsMPL.FUNCTION_SIGN $2 $4 $6 }
+  | 'proc' PIdent '::' ListMplType '|' ListMplType '=>' ListMplType { MplLanguage.AbsMPL.PROCESS_SIGN $2 $4 $6 $8 }
+  | 'fun' PIdent '::' ListMplType '->' MplType '=' '{' ListPattExprPhrase '}' { MplLanguage.AbsMPL.FUNCTION_IMPL $2 $4 $6 $9 }
+  | 'proc' PIdent '::' ListMplType '|' ListMplType '=>' ListMplType '=' '{' ListProcessPhrase '}' { MplLanguage.AbsMPL.PROCESS_IMPL $2 $4 $6 $8 $11 }
 
 TypeConstraint :: { MplLanguage.AbsMPL.TypeConstraint }
 TypeConstraint
   : UIdent MplType { MplLanguage.AbsMPL.TYPE_CONSTRAINT $1 $2 }
   | UIdent '\\' ListUIdent '->' MplType { MplLanguage.AbsMPL.TYPE_CONSTRAINT_HIGHER_ORDER $1 $3 $5 }
 
+SuperClasses :: { MplLanguage.AbsMPL.SuperClasses }
+SuperClasses
+  : ListTypeConstraint { MplLanguage.AbsMPL.SUPER_CLASSES_SEQ $1 }
+  | ListTypeConstraint '|' ListTypeConstraint { MplLanguage.AbsMPL.SUPER_CLASSES_CONC $1 $3 }
+
 TypeClassDefn :: { MplLanguage.AbsMPL.TypeClassDefn }
 TypeClassDefn
-  : 'class' TypeConstraint 'where' '{' ListFunctionSignature '}' { MplLanguage.AbsMPL.TYPECLASS_DEFN $2 $5 }
-  | 'class' ListTypeConstraint '=>' TypeConstraint 'where' '{' ListFunctionSignature '}' { MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN $2 $4 $7 }
+  : 'class' TypeConstraint 'where' '{' ListClassProp '}' { MplLanguage.AbsMPL.TYPECLASS_DEFN $2 $5 }
+  | 'class' SuperClasses '=>' TypeConstraint 'where' '{' ListClassProp '}' { MplLanguage.AbsMPL.TYPECLASS_SUPERCLASS_DEFN $2 $4 $7 }
 
-ListFunctionSignature :: { [MplLanguage.AbsMPL.FunctionSignature] }
-ListFunctionSignature
-  : FunctionSignature { (:[]) $1 }
-  | FunctionSignature ';' ListFunctionSignature { (:) $1 $3 }
+ListClassProp :: { [MplLanguage.AbsMPL.ClassProp] }
+ListClassProp
+  : ClassProp { (:[]) $1 }
+  | ClassProp ';' ListClassProp { (:) $1 $3 }
 
 ListUIdent :: { [MplLanguage.AbsMPL.UIdent] }
 ListUIdent
   : UIdent { (:[]) $1 } | UIdent ',' ListUIdent { (:) $1 $3 }
 
+ClassPropDefn :: { MplLanguage.AbsMPL.ClassPropDefn }
+ClassPropDefn
+  : FunctionDefn { MplLanguage.AbsMPL.FUNCTION_DEF $1 }
+  | ProcessDefn { MplLanguage.AbsMPL.PROCESS_DEF $1 }
+
 TypeClassInstanceDefn :: { MplLanguage.AbsMPL.TypeClassInstanceDefn }
 TypeClassInstanceDefn
-  : 'instance' TypeConstraint 'where' '{' ListFunctionDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN $2 $5 }
-  | 'instance' ListTypeConstraint '=>' TypeConstraint 'where' '{' ListFunctionDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN $2 $4 $7 }
+  : 'instance' TypeConstraint 'where' '{' ListClassPropDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEFN $2 $5 }
+  | 'instance' SuperClasses '=>' TypeConstraint 'where' '{' ListClassPropDefn '}' { MplLanguage.AbsMPL.TYPECLASS_INSTANCE_DEPENDENCY_DEFN $2 $4 $7 }
 
 ListTypeConstraint :: { [MplLanguage.AbsMPL.TypeConstraint] }
 ListTypeConstraint
   : TypeConstraint { (:[]) $1 }
   | TypeConstraint ',' ListTypeConstraint { (:) $1 $3 }
 
-ListFunctionDefn :: { [MplLanguage.AbsMPL.FunctionDefn] }
-ListFunctionDefn
-  : FunctionDefn { (:[]) $1 }
-  | FunctionDefn ';' ListFunctionDefn { (:) $1 $3 }
+ListClassPropDefn :: { [MplLanguage.AbsMPL.ClassPropDefn] }
+ListClassPropDefn
+  : ClassPropDefn { (:[]) $1 }
+  | ClassPropDefn ';' ListClassPropDefn { (:) $1 $3 }
 
 {
 
