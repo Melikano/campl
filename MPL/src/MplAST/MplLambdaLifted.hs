@@ -73,6 +73,9 @@ type instance XSeqTypeClassDefn MplLambdaLifted = MplSeqTypeClass MplLambdaLifte
 
 type instance XConcTypeClassDefn MplLambdaLifted = MplConcTypeClass MplLambdaLifted
 
+type instance XSeqTypeClassInstanceDefn MplLambdaLifted = MplSeqTypeClassInstance MplLambdaLifted
+
+type instance XConcTypeClassInstanceDefn MplLambdaLifted = MplConcTypeClassInstance MplLambdaLifted
 -- Expression instances
 type instance XMplExpr MplLambdaLifted = MplExpr MplLambdaLifted
 

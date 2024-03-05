@@ -65,6 +65,8 @@ type instance XProcessDefn MplPatternCompiled  = MplProcess MplPatternCompiled
 type instance XSeqTypeClassDefn MplPatternCompiled  = MplSeqTypeClass MplPatternCompiled
 type instance XConcTypeClassDefn MplPatternCompiled  = MplConcTypeClass MplPatternCompiled
 
+type instance XSeqTypeClassInstanceDefn MplPatternCompiled  = MplSeqTypeClassInstance MplPatternCompiled
+type instance XConcTypeClassInstanceDefn MplPatternCompiled  = MplConcTypeClassInstance MplPatternCompiled
 -- Expression instances
 type instance XMplExpr MplPatternCompiled = MplExpr MplPatternCompiled
 type instance XEPOps MplPatternCompiled = XEPOps MplTypeChecked

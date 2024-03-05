@@ -145,6 +145,8 @@ type instance XProcessDefn MplTypeChecked = MplProcess MplTypeChecked
 type instance XSeqTypeClassDefn MplTypeChecked  = MplSeqTypeClass MplTypeChecked
 type instance XConcTypeClassDefn MplTypeChecked  = MplConcTypeClass MplTypeChecked
 
+type instance XSeqTypeClassInstanceDefn MplTypeChecked  = MplSeqTypeClassInstance MplTypeChecked
+type instance XConcTypeClassInstanceDefn MplTypeChecked  = MplConcTypeClassInstance MplTypeChecked
 -- Expression instances
 type instance XMplExpr MplTypeChecked = MplExpr MplTypeChecked
 

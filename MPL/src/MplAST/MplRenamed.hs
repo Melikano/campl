@@ -132,6 +132,8 @@ type instance XProcessDefn MplRenamed  = MplProcess MplRenamed
 type instance XSeqTypeClassDefn MplRenamed  = MplSeqTypeClass MplRenamed
 type instance XConcTypeClassDefn MplRenamed  = MplConcTypeClass MplRenamed
 
+type instance XSeqTypeClassInstanceDefn MplRenamed  = MplSeqTypeClassInstance MplRenamed
+type instance XConcTypeClassInstanceDefn MplRenamed  = MplConcTypeClassInstance MplRenamed
 
 -- Expression instances
 type instance XMplExpr MplRenamed = MplExpr MplRenamed

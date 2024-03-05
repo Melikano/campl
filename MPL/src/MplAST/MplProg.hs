@@ -64,13 +64,20 @@ type family XSeqTypeClassDefn x
 
 type family XConcTypeClassDefn x
 
+type family XSeqTypeClassInstanceDefn x
+
+type family XConcTypeClassInstanceDefn x
+
 type ForallDefn (c :: Type -> Constraint) x =
   ( ForallObjDefn c x,
     c (XFunctionDefn x),
     c (XProcessDefn x),
     c (XSeqTypeClassDefn x),
     c (XConcTypeClassDefn x),
-    c (MplTypeClass x)
+    c (XSeqTypeClassInstanceDefn x),
+    c (XConcTypeClassInstanceDefn x),
+    c (MplTypeClass x),
+    c (MplTypeClassInstance x)
   )
 
 type ForallObjDefn (c :: Type -> Constraint) x =
@@ -87,15 +94,24 @@ data MplDefn x
   | FunctionDefn !(XFunctionDefn x)
   | ProcessDefn !(XProcessDefn x)
   | TypeClassDefn !(MplTypeClass x)
+  | TypeClassInstanceDefn !(MplTypeClassInstance x)
 
 -- data type for type class
 data MplTypeClass x
   = SeqTypeClass !(XSeqTypeClassDefn x)
   | ConcTypeClass !(XConcTypeClassDefn x)
 
+data MplTypeClassInstance x
+  = SeqTypeClassInstance !(XSeqTypeClassInstanceDefn x)
+  | ConcTypeClassInstanceDefn !(XConcTypeClassInstanceDefn x)
+
 deriving instance
   (Show (XSeqTypeClassDefn x), Show (XConcTypeClassDefn x)) =>
   Show (MplTypeClass x)
+
+deriving instance
+  (Show (XSeqTypeClassInstanceDefn x), Show (XConcTypeClassInstanceDefn x)) =>
+  Show (MplTypeClassInstance x)
 
 data MplObjectDefn x
   = SeqObjDefn !(MplSeqObjDefn x)
@@ -325,6 +341,32 @@ deriving instance
 
 $(makeLenses ''MplConcTypeClass)
 
+data MplSeqTypeClassInstance x = MplSeqTypeClassInstance
+  { _seqTypeClassInstanceType :: MplType x,
+    _seqTypeClassInstanceConstrainedTypeVars :: [IdP x],
+    _seqTypeClassInstanceFuns :: [MplFunction x],
+    _seqTypeClassInstanceDependencies :: TypeClassConstraint x
+  }
+
+deriving instance
+  (Show (IdP x), Show (MplType x), Show (MplFunction x)) =>
+  Show (MplSeqTypeClassInstance x)
+
+$(makeLenses ''MplSeqTypeClassInstance)
+
+data MplConcTypeClassInstance x = MplConcTypeClassInstance
+  { _concTypeClassInstanceType :: MplType x,
+    _concTypeClassInstanceConstrainedTypeVars :: [IdP x],
+    _concTypeClassInstanceProcs :: [MplProcess x],
+    _concTypeClassInstanceConcDependencies :: TypeClassConstraint x,
+    _concTypeClassInstanceSeqDependencies :: TypeClassConstraint x
+  }
+
+deriving instance
+  (Show (IdP x), Show (MplProcess x), Show (MplType x)) =>
+  Show (MplConcTypeClassInstance x)
+
+$(makeLenses ''MplConcTypeClassInstance)
 $( concat
      <$> traverse
        makeLenses
@@ -348,7 +390,8 @@ $( concat
          ''MplFunction,
          ''MplProcess,
          ''MplSeqTypeClass,
-         ''MplConcTypeClass
+         ''MplConcTypeClass,
+         ''MplSeqTypeClassInstance
        ]
  )
 
