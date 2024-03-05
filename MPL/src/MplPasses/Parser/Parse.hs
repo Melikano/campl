@@ -184,6 +184,8 @@ parseBnfcDefn (B.MPL_PROCESS_DEFN proc) =
   ProcessDefn <$> parseBnfcProcess proc
 parseBnfcDefn (B.MPL_TYPECLASS_DEFN classDefn) =
   TypeClassDefn <$> parseBnfcTypeClass classDefn
+parseBnfcDefn (B.MPL_INSTANCE_DEFN instanceDefn) =
+  TypeClassInstanceDefn <$> parseBnfcInstance instanceDefn
 parseBnfcDefn B.MPL_DEFNTEST = error "hehe a little easter egg from the developer -- no writing potato as they're better eaten than thought about ;)"
 
 -- FUNCTION PARSING
@@ -583,6 +585,39 @@ parseTypeClassProc (B.PROC_CLASS_PROP proc) =
       phrases' <- traverseTryEach parseBnfcProcessPhrase phrases
       return $ TypeClassProc (toChIdentP id) (Just (seqtype', intype', outtype')) phrases'
 parseTypeClassProc _ = error "Parse Error: Can't define fun inside a concurrent type class"
+
+parseBnfcInstance :: BnfcParse B.TypeClassInstanceDefn (MplTypeClassInstance MplParsed)
+parseBnfcInstance (B.TYPECLASS_INSTANCE_DEFN constraint methods) = do
+  (id, constrainedVars, parsedType) <- parseTypeClassConstraint constraint
+  case methods of
+    [] -> error "Parse Error: Empty type class is not allowed"
+    (m : ms) -> case m of
+      B.FUNCTION_DEF _ -> do
+        methods <- mapM parseTypeClassInstanceFun methods
+        return $ SeqTypeClassInstance $ MplSeqTypeClassInstance parsedType constrainedVars methods []
+      B.PROCESS_DEF _ -> do
+        methods <- mapM parseTypeClassInstanceProc methods
+        return $ ConcTypeClassInstanceDefn $ MplConcTypeClassInstance parsedType constrainedVars methods [] []
+parseBnfcInstance (B.TYPECLASS_INSTANCE_DEPENDENCY_DEFN deps constraint methods) = do
+  (id, constrainedVars, parsedType) <- parseTypeClassConstraint constraint
+  (parsedSeqDeps, parsedConcDeps) <- parseSuperClasses deps
+  case methods of
+    [] -> error "Parse Error: Empty type class is not allowed"
+    (m : ms) -> case m of
+      B.FUNCTION_DEF _ -> do
+        methods <- mapM parseTypeClassInstanceFun methods
+        return $ SeqTypeClassInstance $ MplSeqTypeClassInstance parsedType constrainedVars methods parsedSeqDeps
+      B.PROCESS_DEF _ -> do
+        methods <- mapM parseTypeClassInstanceProc methods
+        return $ ConcTypeClassInstanceDefn $ MplConcTypeClassInstance parsedType constrainedVars methods parsedSeqDeps parsedConcDeps
+
+parseTypeClassInstanceFun :: BnfcParse B.ClassPropDefn (MplFunction MplParsed)
+parseTypeClassInstanceFun (B.FUNCTION_DEF f) = parseBnfcFunction f
+parseTypeClassInstanceFun _ = error "Parse Error"
+
+parseTypeClassInstanceProc :: BnfcParse B.ClassPropDefn (MplProcess MplParsed)
+parseTypeClassInstanceProc (B.PROCESS_DEF p) = parseBnfcProcess p
+parseTypeClassInstanceProc _ = error "Parse Error"
 
 buggedKeywordNameOcc :: String -> KeyWordNameOcc
 buggedKeywordNameOcc str =

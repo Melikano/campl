@@ -90,6 +90,8 @@ type instance XProcessDefn MplParsed  = MplProcess MplParsed
 type instance XSeqTypeClassDefn MplParsed  = MplSeqTypeClass MplParsed
 type instance XConcTypeClassDefn MplParsed  = MplConcTypeClass MplParsed
 
+type instance XSeqTypeClassInstanceDefn MplParsed  = MplSeqTypeClassInstance MplParsed
+type instance XConcTypeClassInstanceDefn MplParsed  = MplConcTypeClassInstance MplParsed
 
 -- Expression instances
 type instance XMplExpr MplParsed = MplExpr MplParsed
