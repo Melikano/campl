@@ -206,6 +206,8 @@ type instance XFunType MplParsed  = Maybe ([XMplType MplParsed], XMplType MplPar
 type instance XProcType MplParsed = 
     Maybe ([XMplType MplParsed], [XMplType MplParsed], [XMplType MplParsed])
 
+type instance XTypeClassType MplParsed = XMplType MplParsed
+
 type instance XMplType MplParsed = MplType MplParsed
 type instance XTypeSeqWithArgs MplParsed = Void
 type instance XTypeSeqVarWithArgs MplParsed = ()

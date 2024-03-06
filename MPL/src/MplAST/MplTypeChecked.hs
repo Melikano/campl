@@ -8,6 +8,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -16,7 +17,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE  ImportQualifiedPost #-}
 
 module MplAST.MplTypeChecked where
 
@@ -140,13 +140,17 @@ type instance
     MplTypeClauseSpine MplTypeChecked (ConcObjTag CoprotocolDefnTag)
 
 type instance XFunctionDefn MplTypeChecked = MplFunction MplTypeChecked
+
 type instance XProcessDefn MplTypeChecked = MplProcess MplTypeChecked
 
-type instance XSeqTypeClassDefn MplTypeChecked  = MplSeqTypeClass MplTypeChecked
-type instance XConcTypeClassDefn MplTypeChecked  = MplConcTypeClass MplTypeChecked
+type instance XSeqTypeClassDefn MplTypeChecked = MplSeqTypeClass MplTypeChecked
 
-type instance XSeqTypeClassInstanceDefn MplTypeChecked  = MplSeqTypeClassInstance MplTypeChecked
-type instance XConcTypeClassInstanceDefn MplTypeChecked  = MplConcTypeClassInstance MplTypeChecked
+type instance XConcTypeClassDefn MplTypeChecked = MplConcTypeClass MplTypeChecked
+
+type instance XSeqTypeClassInstanceDefn MplTypeChecked = MplSeqTypeClassInstance MplTypeChecked
+
+type instance XConcTypeClassInstanceDefn MplTypeChecked = MplConcTypeClassInstance MplTypeChecked
+
 -- Expression instances
 type instance XMplExpr MplTypeChecked = MplExpr MplTypeChecked
 
@@ -364,6 +368,8 @@ type instance
 type instance
   XProcType MplTypeChecked =
     ([TypeP MplTypeChecked], [XMplType MplTypeChecked], [XMplType MplTypeChecked], [XMplType MplTypeChecked])
+
+type instance XTypeClassType MplTypeChecked = (XMplType MplTypeChecked)
 
 type instance XMplType MplTypeChecked = MplType MplTypeChecked
 
