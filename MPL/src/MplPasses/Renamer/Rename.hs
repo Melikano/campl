@@ -156,6 +156,19 @@ renameDefn (TypeClassDefn (ConcTypeClass (MplConcTypeClass name t tvars procs se
   concSupers' <- mapM renameSupers concSupers
   procs' <- mapM renameTypeClassProcs procs
   return $ TypeClassDefn $ ConcTypeClass $ _MplConcTypeClass # (name', t', tvars', procs', seqSupers', concSupers')
+renameDefn (TypeClassInstanceDefn (SeqTypeClassInstance (MplSeqTypeClassInstance t tvars funs deps))) = do
+  t' <- renameType t
+  tvars' <- traverse tagIdentP tvars
+  deps' <- mapM renameSupers deps
+  funs' <- mapM (renameDefn . FunctionDefn) funs
+  return $ TypeClassInstanceDefn $ SeqTypeClassInstance $ _MplSeqTypeClassInstance # (t', tvars', (\(FunctionDefn p) -> p) <$> funs', deps')
+renameDefn (TypeClassInstanceDefn (ConcTypeClassInstance (MplConcTypeClassInstance t tvars procs seqDeps concDeps))) = do
+  t' <- renameType t
+  tvars' <- traverse tagIdentP tvars
+  seqDeps' <- mapM renameSupers seqDeps
+  concDeps' <- mapM renameSupers concDeps
+  procs' <- mapM (renameDefn . ProcessDefn) procs
+  return $ TypeClassInstanceDefn $ ConcTypeClassInstance $ _MplConcTypeClassInstance # (t', tvars', (\(ProcessDefn p) -> p) <$> procs', seqDeps', concDeps')
 
 renameSupers (sname, svars, stype) = do
   sname' <- tagIdentP sname

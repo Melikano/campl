@@ -211,6 +211,7 @@ instance CollectSymTab (MplDefn MplRenamed) where
     [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))]
   collectSymTab (TypeClassDefn (ConcTypeClass (MplConcTypeClass name _ _ _ _ _))) =
     [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))]
+  collectSymTab (TypeClassInstanceDefn _) = []
 
 instance CollectSymTab IdentR where
   collectSymTab = pure <<< view identRIdentP &&& flip SymEntry Nothing . view uniqueTag

@@ -597,7 +597,7 @@ parseBnfcInstance (B.TYPECLASS_INSTANCE_DEFN constraint methods) = do
         return $ SeqTypeClassInstance $ MplSeqTypeClassInstance parsedType constrainedVars methods []
       B.PROCESS_DEF _ -> do
         methods <- mapM parseTypeClassInstanceProc methods
-        return $ ConcTypeClassInstanceDefn $ MplConcTypeClassInstance parsedType constrainedVars methods [] []
+        return $ ConcTypeClassInstance $ MplConcTypeClassInstance parsedType constrainedVars methods [] []
 parseBnfcInstance (B.TYPECLASS_INSTANCE_DEPENDENCY_DEFN deps constraint methods) = do
   (id, constrainedVars, parsedType) <- parseTypeClassConstraint constraint
   (parsedSeqDeps, parsedConcDeps) <- parseSuperClasses deps
@@ -609,7 +609,7 @@ parseBnfcInstance (B.TYPECLASS_INSTANCE_DEPENDENCY_DEFN deps constraint methods)
         return $ SeqTypeClassInstance $ MplSeqTypeClassInstance parsedType constrainedVars methods parsedSeqDeps
       B.PROCESS_DEF _ -> do
         methods <- mapM parseTypeClassInstanceProc methods
-        return $ ConcTypeClassInstanceDefn $ MplConcTypeClassInstance parsedType constrainedVars methods parsedSeqDeps parsedConcDeps
+        return $ ConcTypeClassInstance $ MplConcTypeClassInstance parsedType constrainedVars methods parsedSeqDeps parsedConcDeps
 
 parseTypeClassInstanceFun :: BnfcParse B.ClassPropDefn (MplFunction MplParsed)
 parseTypeClassInstanceFun (B.FUNCTION_DEF f) = parseBnfcFunction f

@@ -105,7 +105,7 @@ data MplTypeClass x
 
 data MplTypeClassInstance x
   = SeqTypeClassInstance !(XSeqTypeClassInstanceDefn x)
-  | ConcTypeClassInstanceDefn !(XConcTypeClassInstanceDefn x)
+  | ConcTypeClassInstance !(XConcTypeClassInstanceDefn x)
 
 deriving instance
   (Show (XSeqTypeClassDefn x), Show (XConcTypeClassDefn x)) =>
@@ -393,7 +393,8 @@ $( concat
          ''MplProcess,
          ''MplSeqTypeClass,
          ''MplConcTypeClass,
-         ''MplSeqTypeClassInstance
+         ''MplSeqTypeClassInstance,
+         ''MplConcTypeClassInstance
        ]
  )
 
