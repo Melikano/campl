@@ -207,10 +207,12 @@ instance CollectSymTab (MplDefn MplRenamed) where
     [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))]
   collectSymTab (ProcessDefn (MplProcess name _ _)) =
     [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymProcInfo # ()))]
-  collectSymTab (TypeClassDefn (SeqTypeClass (MplSeqTypeClass name _ _ _ _))) =
-    [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))]
-  collectSymTab (TypeClassDefn (ConcTypeClass (MplConcTypeClass name _ _ _ _ _))) =
-    [(name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))]
+  collectSymTab (TypeClassDefn (SeqTypeClass (MplSeqTypeClass name _ _ funs _))) =
+    (name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))
+      : ((\(TypeClassFun name _ _) -> (name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))) <$> funs)
+  collectSymTab (TypeClassDefn (ConcTypeClass (MplConcTypeClass name _ _ procs _ _))) =
+    (name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymFunInfo # ()))
+      : ((\(TypeClassProc name _ _) -> (name ^. identRIdentP, SymEntry (name ^. uniqueTag) (_Just % _SymProcInfo # ()))) <$> procs)
   collectSymTab (TypeClassInstanceDefn _) = []
 
 instance CollectSymTab IdentR where

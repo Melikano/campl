@@ -675,11 +675,15 @@ instance Print MplLanguage.AbsMPL.ImportDefn where
 
 instance Print MplLanguage.AbsMPL.FunClassProp where
   prt i = \case
+    MplLanguage.AbsMPL.INTERNAL_FUNCTION_SIGN pident mpltype -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltype])
+    MplLanguage.AbsMPL.INTERNAL_FUNCTION_IMPL pident mpltype pattexprphrases -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltype, doc (showString "="), doc (showString "{"), prt 0 pattexprphrases, doc (showString "}")])
     MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltypes, doc (showString "->"), prt 0 mpltype])
     MplLanguage.AbsMPL.FUNCTION_IMPL pident mpltypes mpltype pattexprphrases -> prPrec i 0 (concatD [doc (showString "fun"), prt 0 pident, doc (showString "::"), prt 0 mpltypes, doc (showString "->"), prt 0 mpltype, doc (showString "="), doc (showString "{"), prt 0 pattexprphrases, doc (showString "}")])
 
 instance Print MplLanguage.AbsMPL.ProcClassProp where
   prt i = \case
+    MplLanguage.AbsMPL.INTERNAL_PROCESS_SIGN pident mpltype -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltype])
+    MplLanguage.AbsMPL.INTERNAL_PROCESS_IMPL pident mpltype processphrases -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltype, doc (showString "="), doc (showString "{"), prt 0 processphrases, doc (showString "}")])
     MplLanguage.AbsMPL.PROCESS_SIGN pident mpltypes1 mpltypes2 mpltypes3 -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltypes1, doc (showString "|"), prt 0 mpltypes2, doc (showString "=>"), prt 0 mpltypes3])
     MplLanguage.AbsMPL.PROCESS_IMPL pident mpltypes1 mpltypes2 mpltypes3 processphrases -> prPrec i 0 (concatD [doc (showString "proc"), prt 0 pident, doc (showString "::"), prt 0 mpltypes1, doc (showString "|"), prt 0 mpltypes2, doc (showString "=>"), prt 0 mpltypes3, doc (showString "="), doc (showString "{"), prt 0 processphrases, doc (showString "}")])
 

@@ -132,13 +132,19 @@ renameDefn (ProcessDefn (MplProcess name proctype defn)) = do
   return $ ProcessDefn $ _MplProcess # (name', proctype', defn')
 renameDefn (TypeClassDefn (SeqTypeClass (MplSeqTypeClass name t tvars funs supers))) = do
   name' <- tagIdentP name
+  tvars' <-
+    mapM
+      ( \var -> do
+          (_, tvar) <- renameType var
+          return tvar
+      )
+      tvars
   t' <- renameType t
-  tvars' <- traverse tagIdentP tvars
   supers' <-
     mapM
       ( \(sname, svars, stype) -> do
           sname' <- tagIdentP sname
-          svars' <- traverse tagIdentP svars
+          svars' <- mapM renameTVar svars
           stype' <- renameType stype
           return (sname', svars', stype')
       )
@@ -150,29 +156,34 @@ renameDefn (TypeClassDefn (SeqTypeClass (MplSeqTypeClass name t tvars funs super
   return $ TypeClassDefn $ SeqTypeClass $ _MplSeqTypeClass # (name', t', tvars', funs', supers')
 renameDefn (TypeClassDefn (ConcTypeClass (MplConcTypeClass name t tvars procs seqSupers concSupers))) = do
   name' <- tagIdentP name
+  tvars' <- mapM renameTVar tvars
   t' <- renameType t
-  tvars' <- traverse tagIdentP tvars
   seqSupers' <- mapM renameSupers seqSupers
   concSupers' <- mapM renameSupers concSupers
   procs' <- mapM renameTypeClassProcs procs
   return $ TypeClassDefn $ ConcTypeClass $ _MplConcTypeClass # (name', t', tvars', procs', seqSupers', concSupers')
 renameDefn (TypeClassInstanceDefn (SeqTypeClassInstance (MplSeqTypeClassInstance t tvars funs deps))) = do
+  tvars' <- mapM renameTVar tvars 
   t' <- renameType t
-  tvars' <- traverse tagIdentP tvars
   deps' <- mapM renameSupers deps
   funs' <- mapM (renameDefn . FunctionDefn) funs
   return $ TypeClassInstanceDefn $ SeqTypeClassInstance $ _MplSeqTypeClassInstance # (t', tvars', (\(FunctionDefn p) -> p) <$> funs', deps')
 renameDefn (TypeClassInstanceDefn (ConcTypeClassInstance (MplConcTypeClassInstance t tvars procs seqDeps concDeps))) = do
+  tvars' <- mapM renameTVar tvars 
   t' <- renameType t
-  tvars' <- traverse tagIdentP tvars
   seqDeps' <- mapM renameSupers seqDeps
   concDeps' <- mapM renameSupers concDeps
   procs' <- mapM (renameDefn . ProcessDefn) procs
   return $ TypeClassInstanceDefn $ ConcTypeClassInstance $ _MplConcTypeClassInstance # (t', tvars', (\(ProcessDefn p) -> p) <$> procs', seqDeps', concDeps')
 
+renameTVar :: Rename (MplType MplParsed) (MplType MplRenamed)
+renameTVar var = do
+  (_, tvar) <- renameType var
+  return tvar
+
 renameSupers (sname, svars, stype) = do
   sname' <- tagIdentP sname
-  svars' <- traverse tagIdentP svars
+  svars' <- mapM renameTVar svars
   stype' <- renameType stype
   return (sname', svars', stype')
 

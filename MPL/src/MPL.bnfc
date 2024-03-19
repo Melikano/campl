@@ -546,10 +546,23 @@ IMPORT_DEFN           . ImportDefn ::= "include"               UIdent           
 -- ====================================================================
 --  MPL typeclass definition
 -- ====================================================================
+internal INTERNAL_FUNCTION_SIGN . FunClassProp ::= 
+    "fun" PIdent "::" MplType ;
+internal INTERNAL_FUNCTION_IMPL . FunClassProp ::= 
+    "fun" PIdent "::" MplType 
+        "=" "{" [ PattExprPhrase ]"}" ;
+
 FUNCTION_SIGN . FunClassProp ::= "fun" PIdent "::" [MplType] "->" MplType ; 
 FUNCTION_IMPL . FunClassProp ::= 
     "fun" PIdent "::" [MplType] "->" MplType 
-        "=" "{" [ PattExprPhrase ]"}" ; ;
+        "=" "{" [ PattExprPhrase ]"}" ;
+
+internal INTERNAL_PROCESS_SIGN . ProcClassProp ::= 
+    "proc" PIdent "::" MplType ;
+
+internal INTERNAL_PROCESS_IMPL . ProcClassProp ::= 
+    "proc" PIdent "::" MplType
+                   "=" "{" [ProcessPhrase] "}" ;
 
 PROCESS_SIGN . ProcClassProp ::= "proc" PIdent "::" [MplType]  "|" [MplType] "=>" [MplType] ;
 PROCESS_IMPL . ProcClassProp ::=     

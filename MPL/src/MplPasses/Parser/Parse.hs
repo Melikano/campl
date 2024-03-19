@@ -521,10 +521,10 @@ parseBnfcTypeClass (B.TYPECLASS_DEFN constraint methods) = do
     (m : ms) -> case m of
       B.FUN_CLASS_PROP _ -> do
         methods <- mapM parseTypeClassFun methods
-        return $ SeqTypeClass $ MplSeqTypeClass (toTermIdentP id) parsedType (toTermIdentP <$> constrainedVars) methods []
+        return $ SeqTypeClass $ MplSeqTypeClass (toTermIdentP id) parsedType constrainedVars methods []
       B.PROC_CLASS_PROP _ -> do
         methods <- mapM parseTypeClassProc methods
-        return $ ConcTypeClass $ MplConcTypeClass (toTermIdentP id) parsedType (toTermIdentP <$> constrainedVars) methods [] []
+        return $ ConcTypeClass $ MplConcTypeClass (toTermIdentP id) parsedType constrainedVars methods [] []
 parseBnfcTypeClass (B.TYPECLASS_SUPERCLASS_DEFN superclasses constraint methods) = do
   (id, constrainedVars, parsedType) <- parseTypeClassConstraint constraint
   (parsedSeqSuperclasses, parsedConcSuperClasses) <- parseSuperClasses superclasses
@@ -533,16 +533,16 @@ parseBnfcTypeClass (B.TYPECLASS_SUPERCLASS_DEFN superclasses constraint methods)
     (m : ms) -> case m of
       B.FUN_CLASS_PROP {} -> do
         methods <- mapM parseTypeClassFun methods
-        return $ SeqTypeClass $ MplSeqTypeClass (toTermIdentP id) parsedType (toTermIdentP <$> constrainedVars) methods parsedSeqSuperclasses
+        return $ SeqTypeClass $ MplSeqTypeClass (toTermIdentP id) parsedType constrainedVars methods parsedSeqSuperclasses
       B.PROC_CLASS_PROP {} -> do
         methods <- mapM parseTypeClassProc methods
-        return $ ConcTypeClass $ MplConcTypeClass (toTermIdentP id) parsedType (toTermIdentP <$> constrainedVars) methods parsedSeqSuperclasses parsedConcSuperClasses
+        return $ ConcTypeClass $ MplConcTypeClass (toTermIdentP id) parsedType constrainedVars methods parsedSeqSuperclasses parsedConcSuperClasses
 
 parseSuperClasses ::
   BnfcParse
     B.SuperClasses
-    ( [(IdentP, [IdentP], MplType MplParsed)],
-      [(IdentP, [IdentP], MplType MplParsed)]
+    ( [(IdentP, [MplType MplParsed], MplType MplParsed)],
+      [(IdentP, [MplType MplParsed], MplType MplParsed)]
     )
 parseSuperClasses (B.SUPER_CLASSES_SEQ classes) = do
   parsedSuperclasses <- mapM parseTypeClassConstraint classes
@@ -552,10 +552,11 @@ parseSuperClasses (B.SUPER_CLASSES_CONC seqClasses concClasses) = do
   parsedConcSupers <- mapM parseTypeClassConstraint concClasses
   return (parsedSeqSupers, parsedConcSupers)
 
-parseTypeClassConstraint :: BnfcParse B.TypeConstraint (IdentP, [IdentP], MplType MplParsed)
+parseTypeClassConstraint :: BnfcParse B.TypeConstraint (IdentP, [MplType MplParsed], MplType MplParsed)
 parseTypeClassConstraint (B.TYPE_CONSTRAINT_HIGHER_ORDER id vs tp) = do
   t <- parseBnfcType tp
-  return (toTermIdentP id, toTermIdentP <$> vs, t)
+  tvars <- mapM parseBnfcType (B.MPL_UIDENT_NO_ARGS_TYPE <$> vs)
+  return (toTermIdentP id, tvars, t)
 parseTypeClassConstraint (B.TYPE_CONSTRAINT id tp) = do
   t <- parseBnfcType tp
   return (toTermIdentP id, [], t)

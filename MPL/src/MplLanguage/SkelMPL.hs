@@ -462,11 +462,15 @@ transImportDefn x = case x of
 
 transFunClassProp :: MplLanguage.AbsMPL.FunClassProp -> Result
 transFunClassProp x = case x of
+  MplLanguage.AbsMPL.INTERNAL_FUNCTION_SIGN pident mpltype -> failure x
+  MplLanguage.AbsMPL.INTERNAL_FUNCTION_IMPL pident mpltype pattexprphrases -> failure x
   MplLanguage.AbsMPL.FUNCTION_SIGN pident mpltypes mpltype -> failure x
   MplLanguage.AbsMPL.FUNCTION_IMPL pident mpltypes mpltype pattexprphrases -> failure x
 
 transProcClassProp :: MplLanguage.AbsMPL.ProcClassProp -> Result
 transProcClassProp x = case x of
+  MplLanguage.AbsMPL.INTERNAL_PROCESS_SIGN pident mpltype -> failure x
+  MplLanguage.AbsMPL.INTERNAL_PROCESS_IMPL pident mpltype processphrases -> failure x
   MplLanguage.AbsMPL.PROCESS_SIGN pident mpltypes1 mpltypes2 mpltypes3 -> failure x
   MplLanguage.AbsMPL.PROCESS_IMPL pident mpltypes1 mpltypes2 mpltypes3 processphrases -> failure x
 
