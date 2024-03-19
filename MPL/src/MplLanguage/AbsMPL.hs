@@ -285,12 +285,16 @@ data ImportDefn
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data FunClassProp
-    = FUNCTION_SIGN PIdent [MplType] MplType
+    = INTERNAL_FUNCTION_SIGN PIdent MplType
+    | INTERNAL_FUNCTION_IMPL PIdent MplType [PattExprPhrase]
+    | FUNCTION_SIGN PIdent [MplType] MplType
     | FUNCTION_IMPL PIdent [MplType] MplType [PattExprPhrase]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data ProcClassProp
-    = PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
+    = INTERNAL_PROCESS_SIGN PIdent MplType
+    | INTERNAL_PROCESS_IMPL PIdent MplType [ProcessPhrase]
+    | PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
     | PROCESS_IMPL PIdent [MplType] [MplType] [MplType] [ProcessPhrase]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 

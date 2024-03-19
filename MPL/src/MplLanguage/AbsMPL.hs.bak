@@ -284,11 +284,22 @@ data ImportDefn
     | IMPORT_DEFN UIdent
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data ClassProp
-    = FUNCTION_SIGN PIdent [MplType] MplType
-    | PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
+data FunClassProp
+    = INTERNAL_FUNCTION_SIGN PIdent MplType
+    | INTERNAL_FUNCTION_IMPL PIdent MplType [PattExprPhrase]
+    | FUNCTION_SIGN PIdent [MplType] MplType
     | FUNCTION_IMPL PIdent [MplType] MplType [PattExprPhrase]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ProcClassProp
+    = INTERNALPROCESS_SIGN PIdent MplType
+    | INTERNAL_PROCESS_IMPL PIdent MplType [ProcessPhrase]
+    | PROCESS_SIGN PIdent [MplType] [MplType] [MplType]
     | PROCESS_IMPL PIdent [MplType] [MplType] [MplType] [ProcessPhrase]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ClassProp
+    = PROC_CLASS_PROP ProcClassProp | FUN_CLASS_PROP FunClassProp
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data TypeConstraint
